@@ -2,19 +2,47 @@
 <web-app version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
     <servlet>
         <servlet-name>dsnhanvien</servlet-name>
-        <servlet-class>controller.dsnhanvien</servlet-class>
+        <servlet-class>controller.NhanVienController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>XoaNhanVien</servlet-name>
-        <servlet-class>controller.XoaNhanVien</servlet-class>
+        <servlet-class>controller.NhanVienController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>themNhanvien</servlet-name>
-        <servlet-class>controller.themNhanvien</servlet-class>
+        <servlet-class>controller.NhanVienController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>locNhanvien</servlet-name>
-        <servlet-class>controller.locNhanvien</servlet-class>
+        <servlet-class>controller.NhanVienController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>dsphongban</servlet-name>
+        <servlet-class>controller.PhongBanController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>themPhongBan</servlet-name>
+        <servlet-class>controller.PhongBanController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>xoaPhongBan</servlet-name>
+        <servlet-class>controller.PhongBanController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>locPhongBan</servlet-name>
+        <servlet-class>controller.PhongBanController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>layNhanVienChoTruongPhong</servlet-name>
+        <servlet-class>controller.PhongBanApiController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>chiTietPhongBan</servlet-name>
+        <servlet-class>controller.PhongBanApiController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>layPhongBanKhac</servlet-name>
+        <servlet-class>controller.PhongBanApiController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>dsnhanvien</servlet-name>
@@ -31,6 +59,34 @@
     <servlet-mapping>
         <servlet-name>locNhanvien</servlet-name>
         <url-pattern>/locNhanvien</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>dsphongban</servlet-name>
+        <url-pattern>/dsphongban</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>themPhongBan</servlet-name>
+        <url-pattern>/themPhongBan</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>xoaPhongBan</servlet-name>
+        <url-pattern>/xoaPhongBan</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>locPhongBan</servlet-name>
+        <url-pattern>/locPhongBan</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>layNhanVienChoTruongPhong</servlet-name>
+        <url-pattern>/layNhanVienChoTruongPhong</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>chiTietPhongBan</servlet-name>
+        <url-pattern>/chiTietPhongBan</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>layPhongBanKhac</servlet-name>
+        <url-pattern>/layPhongBanKhac</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

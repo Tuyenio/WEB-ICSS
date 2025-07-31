@@ -548,7 +548,7 @@
                 const vaiTro = $('#filterRole').val();
 
                 $.ajax({
-                    url: './locNhanvien',
+                    url: './locNhanvien?action=search',
                     type: 'POST',
                     data: {
                         keyword: keyword,
@@ -626,7 +626,7 @@
                     if (result.isConfirmed) {
                         // Gửi AJAX POST đến Servlet
                         $.ajax({
-                            url: './xoaNhanvien',
+                            url: './xoaNhanvien?action=delete',
                             method: 'POST',
                             data: {id: id},
                             success: function (res) {

@@ -172,4 +172,235 @@ public class KNCSDL {
         }
         return danhSach;
     }
+
+    // ========== PHẦN XỬ LÝ PHÒNG BAN ==========
+    
+    /**
+     * Lấy danh sách tất cả phòng ban kèm thông tin trưởng phòng và số nhân viên
+     */
+    public ResultSet layDanhSachPhongBan() throws SQLException {
+        Statement st = this.cn.createStatement();
+        String sql = "SELECT "
+                + "pb.id, "
+                + "pb.ten_phong, "
+                + "pb.truong_phong_id, "
+                + "nv.ho_ten AS ten_truong_phong, "
+                + "pb.ngay_tao, "
+                + "(SELECT COUNT(*) FROM nhanvien WHERE phong_ban_id = pb.id) AS so_nhan_vien "
+                + "FROM phong_ban pb "
+                + "LEFT JOIN nhanvien nv ON pb.truong_phong_id = nv.id "
+                + "ORDER BY pb.id";
+
+        ResultSet rs = st.executeQuery(sql);
+        return rs;
+    }
+
+    /**
+     * Cập nhật thông tin phòng ban
+     */
+    public boolean capNhatPhongBan(int id, String tenPhong, Integer truongPhongId) throws SQLException {
+        String sql = "UPDATE phong_ban SET ten_phong=?, truong_phong_id=? WHERE id=?";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setString(1, tenPhong);
+        if (truongPhongId != null) {
+            ps.setInt(2, truongPhongId);
+        } else {
+            ps.setNull(2, Types.INTEGER);
+        }
+        ps.setInt(3, id);
+
+        return ps.executeUpdate() > 0;
+    }
+
+    /**
+     * Xóa phòng ban
+     */
+    public boolean xoaPhongBan(int id) {
+        String sql = "DELETE FROM phong_ban WHERE id = ?";
+        try (PreparedStatement stmt = cn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Thêm phòng ban mới
+     */
+    public boolean themPhongBan(String tenPhong, Integer truongPhongId) throws SQLException {
+        String sql = "INSERT INTO phong_ban (ten_phong, truong_phong_id, ngay_tao) VALUES (?, ?, NOW())";
+
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, tenPhong);
+            if (truongPhongId != null) {
+                ps.setInt(2, truongPhongId);
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Lọc phòng ban theo từ khóa
+     */
+    public List<Map<String, Object>> locPhongBan(String keyword) throws SQLException {
+        List<Map<String, Object>> danhSach = new ArrayList<>();
+
+        String sql = "SELECT "
+                + "pb.id, "
+                + "pb.ten_phong, "
+                + "pb.truong_phong_id, "
+                + "nv.ho_ten AS ten_truong_phong, "
+                + "pb.ngay_tao, "
+                + "(SELECT COUNT(*) FROM nhanvien WHERE phong_ban_id = pb.id) AS so_nhan_vien "
+                + "FROM phong_ban pb "
+                + "LEFT JOIN nhanvien nv ON pb.truong_phong_id = nv.id "
+                + "WHERE 1=1";
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " AND (pb.ten_phong LIKE ? OR nv.ho_ten LIKE ?)";
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+        }
+
+        sql += " ORDER BY pb.id";
+
+        PreparedStatement ps = cn.prepareStatement(sql);
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Map<String, Object> pb = new HashMap<>();
+            pb.put("id", rs.getInt("id"));
+            pb.put("ten_phong", rs.getString("ten_phong"));
+            pb.put("truong_phong_id", rs.getObject("truong_phong_id"));
+            pb.put("ten_truong_phong", rs.getString("ten_truong_phong"));
+            pb.put("ngay_tao", rs.getString("ngay_tao"));
+            pb.put("so_nhan_vien", rs.getInt("so_nhan_vien"));
+            danhSach.add(pb);
+        }
+        return danhSach;
+    }
+
+    /**
+     * Lấy danh sách nhân viên để làm trưởng phòng
+     */
+    public ResultSet layDanhSachNhanVienChoTruongPhong() throws SQLException {
+        Statement st = this.cn.createStatement();
+        String sql = "SELECT id, ho_ten, chuc_vu FROM nhanvien WHERE trang_thai_lam_viec = 'DangLam' ORDER BY ho_ten";
+        return st.executeQuery(sql);
+    }
+
+    /**
+     * Lấy danh sách nhân viên trong phòng ban
+     */
+    public List<Map<String, Object>> layNhanVienTheoPhongBan(int phongBanId) throws SQLException {
+        List<Map<String, Object>> danhSach = new ArrayList<>();
+        String sql = "SELECT id, ho_ten, chuc_vu, email, so_dien_thoai FROM nhanvien WHERE phong_ban_id = ? AND trang_thai_lam_viec = 'DangLam'";
+        
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, phongBanId);
+        ResultSet rs = ps.executeQuery();
+        
+        while (rs.next()) {
+            Map<String, Object> nv = new HashMap<>();
+            nv.put("id", rs.getInt("id"));
+            nv.put("ho_ten", rs.getString("ho_ten"));
+            nv.put("chuc_vu", rs.getString("chuc_vu"));
+            nv.put("email", rs.getString("email"));
+            nv.put("so_dien_thoai", rs.getString("so_dien_thoai"));
+            danhSach.add(nv);
+        }
+        return danhSach;
+    }
+
+    /**
+     * Lấy chi tiết phòng ban
+     */
+    public Map<String, Object> layChiTietPhongBan(int id) throws SQLException {
+        String sql = "SELECT "
+                + "pb.id, "
+                + "pb.ten_phong, "
+                + "pb.truong_phong_id, "
+                + "nv.ho_ten AS ten_truong_phong, "
+                + "pb.ngay_tao "
+                + "FROM phong_ban pb "
+                + "LEFT JOIN nhanvien nv ON pb.truong_phong_id = nv.id "
+                + "WHERE pb.id = ?";
+
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            Map<String, Object> phongBan = new HashMap<>();
+            phongBan.put("id", rs.getInt("id"));
+            phongBan.put("ten_phong", rs.getString("ten_phong"));
+            phongBan.put("truong_phong_id", rs.getObject("truong_phong_id"));
+            phongBan.put("ten_truong_phong", rs.getString("ten_truong_phong"));
+            phongBan.put("ngay_tao", rs.getTimestamp("ngay_tao"));
+            return phongBan;
+        }
+        return null;
+    }
+
+    /**
+     * Kiểm tra phòng ban có nhân viên không
+     */
+    public boolean kiemTraPhongBanCoNhanVien(int phongBanId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM nhanvien WHERE phong_ban_id = ? AND trang_thai_lam_viec = 'DangLam'";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, phongBanId);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
+    /**
+     * Lấy danh sách phòng ban khác (để chuyển nhân viên)
+     */
+    public List<Map<String, Object>> layDanhSachPhongBanKhac(int phongBanHienTai) throws SQLException {
+        List<Map<String, Object>> danhSach = new ArrayList<>();
+        String sql = "SELECT id, ten_phong FROM phong_ban WHERE id != ? ORDER BY ten_phong";
+        
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, phongBanHienTai);
+        ResultSet rs = ps.executeQuery();
+        
+        while (rs.next()) {
+            Map<String, Object> pb = new HashMap<>();
+            pb.put("id", rs.getInt("id"));
+            pb.put("ten_phong", rs.getString("ten_phong"));
+            danhSach.add(pb);
+        }
+        return danhSach;
+    }
+
+    /**
+     * Chuyển tất cả nhân viên sang phòng ban khác
+     */
+    public boolean chuyenNhanVienSangPhongBanKhac(int phongBanCu, int phongBanMoi) throws SQLException {
+        String sql = "UPDATE nhanvien SET phong_ban_id = ? WHERE phong_ban_id = ? AND trang_thai_lam_viec = 'DangLam'";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, phongBanMoi);
+        ps.setInt(2, phongBanCu);
+        
+        return ps.executeUpdate() >= 0;
+    }
 }
